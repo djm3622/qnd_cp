@@ -1,1 +1,3 @@
-# qnd_cp
+# Conformal Prediction for Neural Quantum Decoders
+
+This is the repository for our QML project...
