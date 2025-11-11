@@ -1,12 +1,3 @@
-"""
-surface17_explorer.py
-
-Utilities to explore the distance-3 rotated surface code (surface-17)
-with qiskit-qec and some simple matplotlib visualizations.
-
-This is meant for interactive use from a Jupyter notebook.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -17,11 +8,6 @@ import matplotlib.pyplot as plt
 
 from qiskit import QuantumCircuit
 from qiskit_qec.circuits import SurfaceCodeCircuit
-
-
-# ----------------------------------------------------------------------
-# 1. Build the Surface-17 circuit with qiskit-qec
-# ----------------------------------------------------------------------
 
 
 def build_surface17_circuit(T: int = 3) -> SurfaceCodeCircuit:
@@ -41,7 +27,7 @@ def build_surface17_circuit(T: int = 3) -> SurfaceCodeCircuit:
     sc = SurfaceCodeCircuit(
         d=3,          # code distance => surface-17 layout
         T=T,          # number of measurement rounds
-        basis="z",    # choose logical basis; you can change this if desired
+        basis="z",    # choose logical basis
         resets=True,  # reset ancillas between cycles
     )
     return sc
@@ -91,24 +77,13 @@ def draw_surface17_circuit(
 
     qc = extract_qiskit_circuit(sc)
 
-    # fold=-1 => one long row, no wrapping
     fig = qc.draw("mpl", fold=-1, scale=scale)
 
-    # Make the figure physically huge and high dpi
     fig.set_size_inches(width_in, height_in)
     fig.set_dpi(dpi)
 
-    # Remove tight_layout, which tends to crush margins
-
     fig.suptitle(f"Surface-17 circuit (distance 3, T={T} cycles)", fontsize=20)
     return fig
-
-
-
-# ----------------------------------------------------------------------
-# 2. A simple geometric layout for the surface-17 lattice
-#    (for intuition, not tied to qiskit-qec qubit indices)
-# ----------------------------------------------------------------------
 
 
 @dataclass
@@ -134,7 +109,6 @@ def make_surface17_layout() -> Surface17Layout:
     This matches the usual rotated surface code picture, but labels
     are purely conceptual.
     """
-    # Data qubits on 3x3 grid, coordinates scaled by 1.0
     data_coords = {}
     idx = 0
     for j in range(3):
@@ -228,21 +202,16 @@ def plot_surface17_layout(
     plt.tight_layout()
 
 
-# ----------------------------------------------------------------------
-# 3. Simple error sampling and visualization on the lattice
-# ----------------------------------------------------------------------
-
-
 def sample_data_errors(p_phys: float, n_data: int = 9, rng: Optional[np.random.Generator] = None):
     """
     Sample a random X error pattern on data qubits with probability p_phys.
 
-    This is not using qiskit-qec, it is a simple classical toy model.
+    This is NOT using qiskit-qec, it is a simple classical toy model.
     """
     if rng is None:
         rng = np.random.default_rng()
     mask = rng.random(n_data) < p_phys
-    return mask  # length n_data boolean array
+    return mask 
 
 
 def plot_random_error_configuration(p_phys: float = 0.1, rng: Optional[np.random.Generator] = None):
@@ -256,22 +225,3 @@ def plot_random_error_configuration(p_phys: float = 0.1, rng: Optional[np.random
     plot_surface17_layout(layout, data_errors=errored)
     plt.title(f"Random X error pattern on data qubits (p_phys={p_phys})")
     plt.tight_layout()
-
-
-# ----------------------------------------------------------------------
-# 4. If run as a script, produce a couple of example figures
-# ----------------------------------------------------------------------
-
-
-if __name__ == "__main__":
-    # Example 1: draw circuit with T=3 cycles
-    sc = build_surface17_circuit(T=3)
-    draw_surface17_circuit(sc, T=3)
-    plt.show()
-
-    # Example 2: show the conceptual lattice and a random error pattern
-    plot_surface17_layout()
-    plt.show()
-
-    plot_random_error_configuration(p_phys=0.15)
-    plt.show()
